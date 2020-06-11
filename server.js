@@ -1,6 +1,7 @@
 const express = require('express')
 const socketIO = require('socket.io')
 const http = require('http')
+const cors = require('cors')
 
 const {
   addUser,
@@ -19,11 +20,13 @@ const io = socketIO(server)
 
 const router = require('./router.js')
 app.use(router)
+app.use(cors())
 
 io.on("connection", (socket) => {
   console.log("New connection");
 
   socket.on("join", ({ name, channel }, callback) => {
+    console.log(name, channel);
     const {user, error} = addUser({
       id: socket.id,
       name: name, 
@@ -38,8 +41,8 @@ io.on("connection", (socket) => {
     socket.emit( 
       'message', 
       {
-        user: "admin", 
-        text: `Welcome to the ${user.channel} channel`
+        user: "Bot", 
+        text: `Hey there, ${user.name}! Welcome to the ${user.channel} channel. There are ${getUsersInChannel(user.channel).length} user(s) in this channel`
       }
     )
 
@@ -48,7 +51,7 @@ io.on("connection", (socket) => {
     socket.to(user.channel).emit(
       'message', 
       {
-        user: "admin", 
+        user: "Bot", 
         text: `${user.name} has joined the ${user.channel} chat`
       }
     )
@@ -91,8 +94,8 @@ io.on("connection", (socket) => {
       io.to(user.channel).emit(
         "message", 
         {
-          user: "admin", 
-          text: `${user.name} has left the chat`
+          user: "Bot", 
+          text: `${user.name} has left the chat. ${getUsersInChannel(user.channel).length} user(s) still in the channel.`
         }
       )
       io.to(user.channel).emit(

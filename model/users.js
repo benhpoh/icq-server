@@ -5,14 +5,6 @@ const addUser = ({ id, name, channel }) => {
   name = name.trim().toLowerCase()
   channel = channel.trim().toLowerCase()
 
-  const nameTaken = users.find(user => {
-    return user.channel === channel && user.name === name
-  })
-
-  if (nameTaken) {
-    name = name + "1"
-  }
-
   const user = { id, name, channel }
 
   users.push(user)
